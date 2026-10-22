@@ -1,0 +1,151 @@
+<section class="task-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Operations</p>
+      <h1>Task Manager</h1>
+    </div>
+    <a routerLink="/tasks/new" class="button primary">New Task</a>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <span>Total</span>
+      <strong>{{ summary.total }}</strong>
+    </div>
+    <div class="summary-card">
+      <span>Completed</span>
+      <strong>{{ summary.completed }}</strong>
+    </div>
+    <div class="summary-card">
+      <span>In progress</span>
+      <strong>{{ summary.inProgress }}</strong>
+    </div>
+    <div class="summary-card">
+      <span>Overdue</span>
+      <strong>{{ summary.overdue }}</strong>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="toast-stack">
+      <div class="toast" *ngIf="toastMessage" [ngClass]="toastType">
+        {{ toastMessage }}
+      </div>
+    </div>
+    <div class="loading" *ngIf="loading">Loading tasks...</div>
+
+    <div class="filters">
+      <input type="text" placeholder="Search by title" [(ngModel)]="searchText" (ngModelChange)="onFilterChange()" />
+      <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
+        <option value="all">All Status</option>
+        <option value="todo">Todo</option>
+        <option value="in-progress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+      <select [(ngModel)]="priorityFilter" (ngModelChange)="onFilterChange()">
+        <option value="all">All Priority</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+    </div>
+
+    <div class="empty-state" *ngIf="!loading && filteredTasks.length === 0">
+      <strong>No tasks match the current filters.</strong>
+      <span>Try changing the search or create a new task.</span>
+    </div>
+
+    <div class="table-wrap" *ngIf="filteredTasks.length > 0">
+      <table class="task-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Due Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let task of paginatedTasks; trackBy: trackByTaskId" draggable="true" (dragstart)="onDragStart(task.id, $event)" (dragend)="onDragEnd($event)" [class.draggable-row]="true">
+            <ng-container *ngIf="editingTaskId !== task.id; else inlineEditRow">
+              <td>
+                <div class="task-title">{{ task.title }}</div>
+                <small *ngIf="task.description">{{ task.description }}</small>
+                <span class="overdue-tag" *ngIf="isOverdue(task)">Overdue</span>
+              </td>
+              <td>
+                <span class="status-pill" [ngClass]="task.status">{{ task.status }}</span>
+                <div class="status-drop-group">
+                  <span class="status-drop" [class.active-drop]="activeDropStatus === 'todo'" (dragover)="allowDrop('todo', $event)" (drop)="onDrop('todo', $event)">Todo</span>
+                  <span class="status-drop" [class.active-drop]="activeDropStatus === 'in-progress'" (dragover)="allowDrop('in-progress', $event)" (drop)="onDrop('in-progress', $event)">In Progress</span>
+                  <span class="status-drop" [class.active-drop]="activeDropStatus === 'completed'" (dragover)="allowDrop('completed', $event)" (drop)="onDrop('completed', $event)">Completed</span>
+                </div>
+                <div class="drop-hint">Drag row and drop here to change status</div>
+              </td>
+              <td>
+                <span class="priority-pill" [ngClass]="task.priority">{{ task.priority }}</span>
+              </td>
+              <td>{{ task.dueDate }}</td>
+              <td>
+                <div class="action-group">
+                  <button class="button" type="button" (click)="startInlineEdit(task)">Edit</button>
+                  <button class="button danger" type="button" (click)="deleteTask(task.id)">Delete</button>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-template #inlineEditRow>
+              <td colspan="5">
+                <form [formGroup]="editForm" class="inline-edit-form" (ngSubmit)="saveInlineEdit(task.id)">
+                  <div class="inline-grid">
+                    <label>
+                      <span>Title</span>
+                      <input formControlName="title" />
+                    </label>
+                    <label>
+                      <span>Status</span>
+                      <select formControlName="status">
+                        <option value="todo">Todo</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Priority</span>
+                      <select formControlName="priority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Due Date</span>
+                      <input type="date" formControlName="dueDate" />
+                    </label>
+                  </div>
+
+                  <label>
+                    <span>Description</span>
+                    <textarea formControlName="description"></textarea>
+                  </label>
+
+                  <div class="inline-actions">
+                    <button class="button primary" type="submit">Save</button>
+                    <button class="button" type="button" (click)="cancelInlineEdit()">Cancel</button>
+                  </div>
+                </form>
+              </td>
+            </ng-template>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="filteredTasks.length > pageSize">
+      <button class="button" type="button" [disabled]="currentPage === 1" (click)="previousPage()">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button class="button" type="button" [disabled]="currentPage === totalPages" (click)="nextPage()">Next</button>
+    </div>
+  </div>
+</section>

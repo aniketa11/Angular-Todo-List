@@ -1,0 +1,60 @@
+<section class="form-page">
+  <div class="form-card">
+    <div class="form-header">
+      <div>
+        <p class="eyebrow">Task details</p>
+        <h2>{{ isEditMode ? 'Edit Task' : 'Create Task' }}</h2>
+      </div>
+      <a routerLink="/tasks" class="button">Back to list</a>
+    </div>
+
+    <form [formGroup]="taskForm" (ngSubmit)="submit()" class="task-form">
+      <label>
+        <span>Title</span>
+        <input formControlName="title" placeholder="e.g. Prepare onboarding checklist" />
+        <small class="error" *ngIf="titleControl?.touched && titleControl?.hasError('required')">Title is required.</small>
+        <small class="error" *ngIf="titleControl?.touched && titleControl?.hasError('minlength')">Title must contain at least 3 characters.</small>
+      </label>
+
+      <label>
+        <span>Description</span>
+        <textarea formControlName="description" placeholder="Add context for this task"></textarea>
+      </label>
+
+      <div class="two-column">
+        <label>
+          <span>Status</span>
+          <select formControlName="status">
+            <option value="">Select status</option>
+            <option value="todo">Todo</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+          <small class="error" *ngIf="taskForm.get('status')?.touched && taskForm.get('status')?.hasError('required')">Status is required.</small>
+        </label>
+
+        <label>
+          <span>Priority</span>
+          <select formControlName="priority">
+            <option value="">Select priority</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+          <small class="error" *ngIf="taskForm.get('priority')?.touched && taskForm.get('priority')?.hasError('required')">Priority is required.</small>
+        </label>
+      </div>
+
+      <label>
+        <span>Due Date</span>
+        <input type="date" formControlName="dueDate" />
+        <small class="error" *ngIf="taskForm.get('dueDate')?.touched && taskForm.get('dueDate')?.hasError('required')">Due date is required.</small>
+      </label>
+
+      <div class="actions">
+        <button type="submit" class="button primary">Save Task</button>
+        <a routerLink="/tasks" class="button">Cancel</a>
+      </div>
+    </form>
+  </div>
+</section>

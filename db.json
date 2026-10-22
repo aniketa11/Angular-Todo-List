@@ -1,0 +1,20 @@
+{
+  "tasks": [
+    {
+      "id": "80a4384a-9c7d-4cab-b74e-69fca092f854",
+      "title": "employee onboarding",
+      "description": "employee selection",
+      "status": "todo",
+      "priority": "low",
+      "dueDate": "2026-10-24"
+    },
+    {
+      "id": "7782b8de-5b1b-4e93-a388-492574781e03",
+      "title": "task assignment",
+      "description": "task 1",
+      "status": "todo",
+      "priority": "medium",
+      "dueDate": "2026-10-25"
+    }
+  ]
+}
